@@ -1,23 +1,5 @@
-# Dependencies
 node_modules/
-npm-debug.log
-yarn-error.log
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Uploaded files (don't commit)
 uploads/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
+.env
 .DS_Store
-Thumbs.db
+*.log

@@ -1,16 +1,15 @@
-# NICLOS - Premium File Hosting
+# 🚀 NICLOS - Premium File Hosting
 
-🚀 **Fast, secure, and beautiful file hosting service**
+A modern, fast, and secure file hosting service built with Node.js and Express.
 
 ## Features
 
-✅ Drag & drop file uploads  
-✅ Up to 1 GB file size  
-✅ Instant shareable links  
-✅ Beautiful glass-morphism UI  
-✅ Progress tracking  
-✅ Copy to clipboard  
-✅ Any file type supported  
+✨ **Premium UI** - Glassmorphism design with smooth animations  
+📤 **Drag & Drop** - Easy file uploading  
+🔗 **Shareable Links** - Get instant download links  
+📁 **Large Files** - Support up to 1 GB  
+🤖 **AI Compatible** - Perfect for sharing with AI tools  
+🔒 **Self-Hosted** - Full control over your data  
 
 ## Quick Start
 
@@ -20,62 +19,54 @@
 # Install dependencies
 npm install
 
-# Start server
+# Run server
 npm start
 ```
 
-Server runs on `http://localhost:3000`
+Open `http://localhost:3000` in your browser.
 
-## Deployment
+### Deploy to Cloud
 
-### Railway.app (Recommended)
+**Railway.app** (Recommended):
 1. Go to [railway.app](https://railway.app)
-2. Create new project → Import from GitHub
-3. Connect this repo
-4. Auto-deploys on push
-5. Get live URL instantly
+2. Create new project from GitHub
+3. Select this repository
+4. Deploy! 🎉
 
-### Render.com
-1. Create new Web Service
-2. Connect GitHub repo
-3. Build: `npm install`
-4. Start: `node server.js`
+**Render.com**:
+1. Go to [render.com](https://render.com)
+2. Create new Web Service
+3. Connect GitHub repo
+4. Start command: `npm start`
+5. Deploy! 🎉
 
-### Heroku
+**Heroku**:
 ```bash
-heroku login
 heroku create your-app-name
 git push heroku main
 ```
 
-## Tech Stack
+## API
 
-- **Frontend**: HTML5, CSS3, Vanilla JS
-- **Backend**: Express.js
-- **File Storage**: Multer
-- **Styling**: Modern glassmorphism design
+### Upload File
+```
+POST /upload
+Content-Type: multipart/form-data
 
-## API Endpoints
+Body: form-data with 'file' field
 
-### POST `/upload`
-Upload a file and get a shareable link.
-
-**Request:**
-- multipart/form-data with `file` field
-
-**Response:**
-```json
+Response:
 {
-  "link": "http://yourdomain.com/files/1234567890-987654321.jpg"
+  "link": "https://your-domain.com/files/unique-filename"
 }
 ```
 
-### GET `/files/:filename`
-Download an uploaded file.
+## Technologies
 
-## Environment Variables
-
-- `PORT` - Server port (default: 3000)
+- **Backend**: Node.js + Express
+- **File Upload**: Multer
+- **Frontend**: Vanilla JS + CSS3
+- **Styling**: Glassmorphism design
 
 ## License
 

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NICLOS · File Host</title>
+    <!-- Google Fonts Premium Feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0b0b12;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .glass {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 40px;
+            padding: 50px 40px;
+            max-width: 680px;
+            width: 100%;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .brand h1 {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c084fc, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+        .brand .tag {
+            background: rgba(255,255,255,0.06);
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            color: #94a3b8;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .sub {
+            color: #64748b;
+            font-size: 15px;
+            margin-bottom: 32px;
+            border-left: 3px solid #60a5fa;
+            padding-left: 16px;
+        }
+        .drop-zone {
+            border: 2px dashed rgba(255,255,255,0.08);
+            border-radius: 28px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: rgba(255,255,255,0.02);
+        }
+        .drop-zone.dragover {
+            border-color: #60a5fa;
+            background: rgba(96,165,250,0.05);
+        }
+        .drop-zone .icon { font-size: 56px; margin-bottom: 12px; display: block; }
+        .drop-zone p { color: #94a3b8; font-size: 16px; }
+        .drop-zone .highlight { color: #60a5fa; font-weight: 600; }
+        .drop-zone .hint { font-size: 13px; color: #475569; margin-top: 8px; }
+        input[type="file"] { display: none; }
+
+        .file-info {
+            margin-top: 24px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .file-info .name { color: #e2e8f0; font-weight: 500; }
+        .file-info .size { color: #64748b; font-size: 14px; }
+
+        .progress {
+            margin-top: 16px;
+            height: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress .bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #60a5fa, #c084fc);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        .result {
+            margin-top: 24px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.04);
+            display: none;
+        }
+        .result label {
+            color: #94a3b8;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .result .link-box {
+            background: #0b0b12;
+            padding: 12px 16px;
+            border-radius: 14px;
+            word-break: break-all;
+            color: #e2e8f0;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.04);
+            font-family: 'Courier New', monospace;
+        }
+        .btn {
+            margin-top: 16px;
+            background: #60a5fa;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #0b0b12;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn:hover { background: #93bbfc; }
+
+        .status { color: #94a3b8; font-size: 14px; margin-top: 16px; text-align: center; }
+
+        .footer {
+            margin-top: 32px;
+            text-align: center;
+            color: #334155;
+            font-size: 12px;
+            border-top: 1px solid rgba(255,255,255,0.03);
+            padding-top: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass">
+    <div class="brand">
+        <h1>NICLOS</h1>
+        <span class="tag">PREMIUM</span>
+    </div>
+    <div class="sub">Upload · Get Link · Share with AI</div>
+
+    <div class="drop-zone" id="dropZone">
+        <span class="icon">⬆️</span>
+        <p>Drag &amp; drop your file here</p>
+        <p style="font-size:13px;">or <span class="highlight">browse</span> to upload</p>
+        <div class="hint">Max 1 GB · APK · .so · ZIP · Any file</div>
+        <input type="file" id="fileInput" />
+    </div>
+
+    <div class="file-info" id="fileInfo">
+        <span class="name" id="fileName">file.so</span>
+        <span class="size" id="fileSize">1.2 MB</span>
+    </div>
+
+    <div class="progress" id="progress"><div class="bar" id="progressBar"></div></div>
+
+    <div class="result" id="result">
+        <label>🔗 Your download link (share with AI):</label>
+        <div class="link-box" id="linkBox">https://...</div>
+        <button class="btn" id="copyBtn">📋 Copy Link</button>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="footer">NICLOS · Self-hosted · All files encrypted in transit</div>
+</div>
+
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const progress = document.getElementById('progress');
+    const progressBar = document.getElementById('progressBar');
+    const result = document.getElementById('result');
+    const linkBox = document.getElementById('linkBox');
+    const status = document.getElementById('status');
+    const copyBtn = document.getElementById('copyBtn');
+
+    const UPLOAD_URL = '/upload'; // backend endpoint
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) handleFile(e.target.files[0]);
+    });
+
+    function handleFile(file) {
+        const maxSize = 1 * 1024 * 1024 * 1024; // 1 GB
+        if (file.size > maxSize) {
+            status.textContent = '❌ File too large (max 1 GB)';
+            status.style.color = '#f87171';
+            return;
+        }
+        status.textContent = '⏳ Uploading...';
+        status.style.color = '#60a5fa';
+
+        // Show file info
+        fileName.textContent = file.name;
+        fileSize.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+        fileInfo.style.display = 'flex';
+        progress.style.display = 'block';
+        result.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', UPLOAD_URL, true);
+
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+                const pct = Math.round((e.loaded / e.total) * 100);
+                progressBar.style.width = pct + '%';
+            }
+        };
+
+        xhr.onload = () => {
+            progressBar.style.width = '100%';
+            if (xhr.status === 200) {
+                const data = JSON.parse(xhr.responseText);
+                if (data.link) {
+                    linkBox.textContent = data.link;
+                    result.style.display = 'block';
+                    status.textContent = '✅ Upload successful!';
+                    status.style.color = '#4ade80';
+                } else {
+                    status.textContent = '❌ Server error: ' + (data.error || 'unknown');
+                    status.style.color = '#f87171';
+                }
+            } else {
+                status.textContent = '❌ Upload failed (HTTP ' + xhr.status + ')';
+                status.style.color = '#f87171';
+            }
+            progress.style.display = 'none';
+        };
+
+        xhr.onerror = () => {
+            status.textContent = '❌ Network error. Is server running?';
+            status.style.color = '#f87171';
+            progress.style.display = 'none';
+        };
+
+        xhr.send(formData);
+    }
+
+    copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(linkBox.textContent).then(() => {
+            status.textContent = '✅ Link copied!';
+            status.style.color = '#4ade80';
+        }).catch(() => {
+            // fallback
+            const range = document.createRange();
+            range.selectNode(linkBox);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            status.textContent = '✅ Link copied (fallback)';
+        });
+    });
+</script>
+</body>
+</html>

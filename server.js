@@ -9,12 +9,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ============================================================
-// 🔑 CLOUDINARY CONFIG — ENVIRONMENT VARIABLES SE
+// 🔑 CLOUDINARY CONFIG — TERA SAHI CLOUD NAME
 // ============================================================
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'c-37b318a3903dc011fa1448a1ab4d13',
-    api_key: process.env.CLOUDINARY_API_KEY || '491437136384661',
-    api_secret: process.env.CLOUDINARY_API_SECRET || 'WWgWP_wegZMb4ZMtbF9Eo8YHDmk'
+    cloud_name: 'hmburijb',  // ✅ Ab sahi hai
+    api_key: '491437136384661',
+    api_secret: 'WWgWP_wegZMb4ZMtbF9Eo8YHDmk'
 });
 
 const upload = multer({
@@ -32,7 +32,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     }
 
     try {
-        // Test Cloudinary connection
         const result = await cloudinary.uploader.upload(req.file.path, {
             public_id: 'niclos_file',
             overwrite: true,

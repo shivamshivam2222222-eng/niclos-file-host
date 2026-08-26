@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NICLOS · File Host</title>
-    <!-- Google Fonts Premium Feel -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NICLOS — File Host</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -20,19 +19,12 @@
         .glass {
             background: rgba(255,255,255,0.03);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255,255,255,0.06);
             border-radius: 40px;
             padding: 50px 40px;
             max-width: 680px;
             width: 100%;
             box-shadow: 0 40px 80px rgba(0,0,0,0.8);
-        }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
         }
         .brand h1 {
             font-size: 36px;
@@ -70,7 +62,7 @@
             border-color: #60a5fa;
             background: rgba(96,165,250,0.05);
         }
-        .drop-zone .icon { font-size: 56px; margin-bottom: 12px; display: block; }
+        .drop-zone .icon { font-size: 56px; display: block; margin-bottom: 12px; }
         .drop-zone p { color: #94a3b8; font-size: 16px; }
         .drop-zone .highlight { color: #60a5fa; font-weight: 600; }
         .drop-zone .hint { font-size: 13px; color: #475569; margin-top: 8px; }
@@ -82,7 +74,6 @@
             background: rgba(255,255,255,0.03);
             border-radius: 20px;
             display: none;
-            align-items: center;
             justify-content: space-between;
             border: 1px solid rgba(255,255,255,0.04);
         }
@@ -143,7 +134,6 @@
         .btn:hover { background: #93bbfc; }
 
         .status { color: #94a3b8; font-size: 14px; margin-top: 16px; text-align: center; }
-
         .footer {
             margin-top: 32px;
             text-align: center;
@@ -155,13 +145,9 @@
     </style>
 </head>
 <body>
-
 <div class="glass">
-    <div class="brand">
-        <h1>NICLOS</h1>
-        <span class="tag">PREMIUM</span>
-    </div>
-    <div class="sub">Upload · Get Link · Share with AI</div>
+    <div class="brand"><h1>NICLOS</h1><span class="tag">PREMIUM</span></div>
+    <div class="sub">Upload · Get Link · AI-Ready</div>
 
     <div class="drop-zone" id="dropZone">
         <span class="icon">⬆️</span>
@@ -185,7 +171,7 @@
     </div>
 
     <div class="status" id="status"></div>
-    <div class="footer">NICLOS · Self-hosted · All files encrypted in transit</div>
+    <div class="footer">NICLOS · Cloudinary · Auto-replace</div>
 </div>
 
 <script>
@@ -201,29 +187,20 @@
     const status = document.getElementById('status');
     const copyBtn = document.getElementById('copyBtn');
 
-    const UPLOAD_URL = '/upload'; // backend endpoint
-
     dropZone.addEventListener('click', () => fileInput.click());
-
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('dragover');
-    });
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('dragover');
-    });
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropZone.classList.remove('dragover');
         if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
     });
-
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length) handleFile(e.target.files[0]);
     });
 
     function handleFile(file) {
-        const maxSize = 1 * 1024 * 1024 * 1024; // 1 GB
+        const maxSize = 1 * 1024 * 1024 * 1024;
         if (file.size > maxSize) {
             status.textContent = '❌ File too large (max 1 GB)';
             status.style.color = '#f87171';
@@ -231,8 +208,6 @@
         }
         status.textContent = '⏳ Uploading...';
         status.style.color = '#60a5fa';
-
-        // Show file info
         fileName.textContent = file.name;
         fileSize.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
         fileInfo.style.display = 'flex';
@@ -243,7 +218,7 @@
         formData.append('file', file);
 
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', UPLOAD_URL, true);
+        xhr.open('POST', '/upload', true);
 
         xhr.upload.onprogress = (e) => {
             if (e.lengthComputable) {
@@ -286,7 +261,6 @@
             status.textContent = '✅ Link copied!';
             status.style.color = '#4ade80';
         }).catch(() => {
-            // fallback
             const range = document.createRange();
             range.selectNode(linkBox);
             window.getSelection().removeAllRanges();

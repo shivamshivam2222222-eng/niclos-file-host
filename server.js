@@ -1,44 +1,79 @@
 const express = require('express');
 const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-// Storage config
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadDir),
-    filename: (req, file, cb) => {
-        const unique = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, unique + path.extname(file.originalname));
-    }
+// ============================================================
+// 🔑 CLOUDINARY CONFIG — TERI CREDENTIALS (Hardcoded)
+// ============================================================
+cloudinary.config({
+    cloud_name: 'Root',      // Replace
+    api_key: '491437136384661',            // Replace
+    api_secret: 'WWgWP_wegZMb4ZMtbF9Eo8YHDmk'       // Replace
 });
 
+// ============================================================
+// 📤 MULTER CONFIG (Temp storage)
+// ============================================================
 const upload = multer({
-    storage,
-    limits: { fileSize: 1 * 1024 * 1024 * 1024 }, // 1 GB
+    dest: 'uploads/',
+    limits: { fileSize: 1 * 1024 * 1024 * 1024 } // 1 GB
 });
 
-// Serve frontend
-app.use(express.static(__dirname + '/public'));
+// ============================================================
+// 🛠️ MIDDLEWARE
+// ============================================================
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Upload endpoint
-app.post('/upload', upload.single('file'), (req, res) => {
+// ============================================================
+// 🚀 UPLOAD ENDPOINT
+// ============================================================
+app.post('/upload', upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
     }
-    const link = `${req.protocol}://${req.get('host')}/files/${req.file.filename}`;
-    res.json({ link });
+
+    try {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            public_id: 'niclos_file',      // 🔥 Same name = replace old
+            overwrite: true,               // 🔥 Replace old file
+            invalidate: true,              // 🔥 Clear CDN cache
+            resource_type: 'auto'          // Auto-detect file type
+        });
+
+        // Clean up temp file
+        fs.unlinkSync(req.file.path);
+
+        res.json({
+            success: true,
+            link: result.secure_url,
+            public_id: result.public_id,
+            originalName: req.file.originalname
+        });
+
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({ error: error.message });
+    }
 });
 
-// Serve files
-app.use('/files', express.static(uploadDir));
+// ============================================================
+// 📂 ROOT ENDPOINT (Health check)
+// ============================================================
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
+// ============================================================
+// 🖥️ SERVER START
+// ============================================================
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ NICLOS server running on http://localhost:${PORT}`);
 });
